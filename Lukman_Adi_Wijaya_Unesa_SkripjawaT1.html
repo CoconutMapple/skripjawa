@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kalkulator Luas Bangun Datar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --card: #161616;
+      --border: #2a2a2a;
+      --accent1: #f0e040;
+      --accent2: #40e0d0;
+      --accent3: #ff6b6b;
+      --text: #f0f0f0;
+      --muted: #777;
+    }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+
+    header h1 span.yellow { color: var(--accent1); }
+    header h1 span.teal   { color: var(--accent2); }
+    header h1 span.red    { color: var(--accent3); }
+
+    header p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .card-rect::before  { background: var(--accent1); }
+    .card-square::before { background: var(--accent2); }
+    .card-tri::before   { background: var(--accent3); }
+
+    .card-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .card-rect  .card-label { color: var(--accent1); }
+    .card-square .card-label { color: var(--accent2); }
+    .card-tri   .card-label { color: var(--accent3); }
+
+    .card h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+
+    .shape-icon {
+      float: right;
+      margin-top: -36px;
+      opacity: 0.12;
+    }
+
+    .formula-box {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    .formula-box span { color: var(--text); font-weight: bold; }
+
+    label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 1rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="number"]:focus { border-color: #555; }
+
+    .card-rect  input:focus { border-color: var(--accent1); }
+    .card-square input:focus { border-color: var(--accent2); }
+    .card-tri   input:focus { border-color: var(--accent3); }
+
+    button {
+      margin-top: 22px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    button:hover  { opacity: 0.85; transform: scale(0.98); }
+    button:active { transform: scale(0.96); }
+
+    .card-rect  button { background: var(--accent1); color: #000; }
+    .card-square button { background: var(--accent2); color: #000; }
+    .card-tri   button { background: var(--accent3); color: #000; }
+
+    .result {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      min-height: 48px;
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+
+    .result.show {
+      color: var(--text);
+      border-style: solid;
+    }
+
+    .card-rect  .result.show { border-color: var(--accent1); background: rgba(240,224,64,0.07); }
+    .card-square .result.show { border-color: var(--accent2); background: rgba(64,224,208,0.07); }
+    .card-tri   .result.show { border-color: var(--accent3); background: rgba(255,107,107,0.07); }
+
+    .result .big {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      display: block;
+    }
+
+    .result .unit { font-size: 0.75rem; color: var(--muted); }
+
+
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>
+    <span class="yellow">Luas</span>
+    <span class="teal"> Bangun</span>
+    <span class="red"> Datar</span>
+  </h1>
+  <p>Persegi Panjang &nbsp;·&nbsp; Bujur Sangkar &nbsp;·&nbsp; Segitiga</p>
+</header>
+
+<div class="grid">
+
+  <!-- ============================
+       KARTU 1: PERSEGI PANJANG
+       ============================ -->
+  <div class="card card-rect">
+    <div class="card-label">Bangun Datar #01</div>
+    <h2>Persegi Panjang</h2>
+    <svg class="shape-icon" width="80" height="54" viewBox="0 0 80 54">
+      <rect x="2" y="2" width="76" height="50" fill="none" stroke="white" stroke-width="4"/>
+    </svg>
+
+    <div class="formula-box">
+      Rumus: <span>Luas = Panjang × Lebar</span>
+    </div>
+
+    <label for="p-panjang">Panjang (cm)</label>
+    <input type="number" id="p-panjang" placeholder="cth: 12" min="0"/>
+
+    <label for="p-lebar">Lebar (cm)</label>
+    <input type="number" id="p-lebar" placeholder="cth: 7" min="0"/>
+
+    <button onclick="hitungPersegiPanjang()">Hitung Luas</button>
+    <div class="result" id="result-rect">Masukkan nilai lalu klik hitung…</div>
+  </div>
+
+  <!-- ============================
+       KARTU 2: BUJUR SANGKAR
+       ============================ -->
+  <div class="card card-square">
+    <div class="card-label">Bangun Datar #02</div>
+    <h2>Bujur Sangkar</h2>
+    <svg class="shape-icon" width="60" height="60" viewBox="0 0 60 60">
+      <rect x="2" y="2" width="56" height="56" fill="none" stroke="white" stroke-width="4"/>
+    </svg>
+
+    <div class="formula-box">
+      Rumus: <span>Luas = Sisi × Sisi (Sisi²)</span>
+    </div>
+
+    <label for="bs-sisi">Panjang Sisi (cm)</label>
+    <input type="number" id="bs-sisi" placeholder="cth: 9" min="0"/>
+
+    <button onclick="hitungBujurSangkar()">Hitung Luas</button>
+    <div class="result" id="result-square">Masukkan nilai lalu klik hitung…</div>
+  </div>
+
+  <!-- ============================
+       KARTU 3: SEGITIGA
+       ============================ -->
+  <div class="card card-tri">
+    <div class="card-label">Bangun Datar #03</div>
+    <h2>Segitiga</h2>
+    <svg class="shape-icon" width="70" height="62" viewBox="0 0 70 62">
+      <polygon points="35,2 68,60 2,60" fill="none" stroke="white" stroke-width="4"/>
+    </svg>
+
+    <div class="formula-box">
+      Rumus: <span>Luas = ½ × Alas × Tinggi</span>
+    </div>
+
+    <label for="sg-alas">Alas (cm)</label>
+    <input type="number" id="sg-alas" placeholder="cth: 10" min="0"/>
+
+    <label for="sg-tinggi">Tinggi (cm)</label>
+    <input type="number" id="sg-tinggi" placeholder="cth: 6" min="0"/>
+
+    <button onclick="hitungSegitiga()">Hitung Luas</button>
+    <div class="result" id="result-tri">Masukkan nilai lalu klik hitung…</div>
+  </div>
+
+</div><!-- /.grid -->
+
+
+
+
+
+<script>
+  // ─────────────────────────────────────────────
+  // FUNGSI 1: Menghitung Luas Persegi Panjang
+  // Rumus : Luas = Panjang × Lebar
+  // Parameter:
+  //   panjang → panjang sisi horizontal (angka)
+  //   lebar   → panjang sisi vertikal   (angka)
+  // ─────────────────────────────────────────────
+  function hitungPersegiPanjang() {
+    // Ambil nilai input dari elemen HTML
+    var panjang = parseFloat(document.getElementById("p-panjang").value);
+    var lebar   = parseFloat(document.getElementById("p-lebar").value);
+
+    // Hitung luas menggunakan operator perkalian (*)
+    var luas = panjang * lebar;
+
+    // Tampilkan hasil ke elemen result
+    tampilkanHasil("result-rect", luas, panjang, lebar, "p × l");
+  }
+
+  // ─────────────────────────────────────────────
+  // FUNGSI 2: Menghitung Luas Bujur Sangkar
+  // Rumus : Luas = Sisi × Sisi  (atau Sisi²)
+  // Parameter:
+  //   sisi → panjang salah satu sisi (angka)
+  //   Karena semua sisi sama, hanya perlu 1 nilai
+  // ─────────────────────────────────────────────
+  function hitungBujurSangkar() {
+    // Ambil nilai input sisi dari elemen HTML
+    var sisi = parseFloat(document.getElementById("bs-sisi").value);
+
+    // Hitung luas: sisi dipangkatkan 2 (sisi * sisi)
+    var luas = sisi * sisi;  // sama dengan: Math.pow(sisi, 2)
+
+    tampilkanHasil("result-square", luas, sisi, sisi, "s²");
+  }
+
+  // ─────────────────────────────────────────────
+  // FUNGSI 3: Menghitung Luas Segitiga
+  // Rumus : Luas = 1/2 × Alas × Tinggi
+  // Parameter:
+  //   alas   → panjang alas segitiga (angka)
+  //   tinggi → tinggi tegak lurus segitiga (angka)
+  // ─────────────────────────────────────────────
+  function hitungSegitiga() {
+    // Ambil nilai alas dan tinggi dari input HTML
+    var alas   = parseFloat(document.getElementById("sg-alas").value);
+    var tinggi = parseFloat(document.getElementById("sg-tinggi").value);
+
+    // Hitung luas menggunakan operator: 0.5 * alas * tinggi
+    var luas = 0.5 * alas * tinggi;
+
+    tampilkanHasil("result-tri", luas, alas, tinggi, "½ × a × t");
+  }
+
+  // ─────────────────────────────────────────────
+  // FUNGSI PEMBANTU: tampilkanHasil
+  // Menampilkan hasil perhitungan ke elemen HTML
+  // Parameter:
+  //   idEl   → id elemen target (string)
+  //   luas   → nilai luas hasil hitung (number)
+  //   v1, v2 → nilai parameter yang dipakai
+  //   label  → label rumus singkat (string)
+  // ─────────────────────────────────────────────
+  function tampilkanHasil(idEl, luas, v1, v2, label) {
+    var el = document.getElementById(idEl);
+
+    // Validasi: pastikan nilai yang dimasukkan adalah angka positif
+    if (isNaN(v1) || isNaN(v2) || v1 <= 0 || v2 <= 0) {
+      el.innerHTML = "⚠ Masukkan angka positif yang valid.";
+      el.className  = "result";
+      return;
+    }
+
+    // Tampilkan hasil dengan format angka desimal maks 2 digit
+    el.innerHTML =
+      `<span class="big">${luas.toFixed(2)}</span>` +
+      `<span class="unit">cm²  (${label} = ${v1} × ${v2})</span>`;
+    el.className = "result show";
+  }
+</script>
+
+</body>
+</html>
