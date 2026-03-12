@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pegawai</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 32px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead th {
+            background-color: #2D7A4F;
+            color: white;
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        thead th:first-child { border-radius: 8px 0 0 0; }
+        thead th:last-child  { border-radius: 0 8px 0 0; }
+        tbody td {
+            padding: 12px 14px;
+            color: #2d3748;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        tbody tr:hover td { background: #f7fafc; }
+        tfoot td {
+            padding: 12px 14px;
+            background: #edf2f7;
+            font-weight: 600;
+            color: #1a202c;
+            border-top: 2px solid #cbd5e0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Data Pegawai</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Pegawai</th>
+                <th>Umur</th>
+                <th>Jabatan</th>
+                <th>Status</th>
+                <th>Gaji Pokok</th>
+                <th>Tunjangan Jabatan</th>
+                <th>BPJS</th>
+                <th>Tunjangan Keluarga</th>
+                <th>Total Gaji</th>
+            </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot id="tfoot"></tfoot>
+    </table>
+</div>
+
+<script>
+    // Data Pegawai
+    const pegawai = {
+        nama    : "Dodi Prayodi",
+        umur    : 25,
+        jabatan : "Manajer",
+        status  : "Menikah"
+    };
+
+    // Fungsi gaji pokok menggunakan if
+    function hitungGajiPokok(jabatan) {
+        if (jabatan === "Manajer")         return 15000000;
+        if (jabatan === "Asisten Manajer") return 10000000;
+        if (jabatan === "Staff")           return 5000000;
+        return 0;
+    }
+
+    // Hitung komponen gaji
+    const gajiPokok         = hitungGajiPokok(pegawai.jabatan);
+    const tunjanganJabatan  = gajiPokok * 0.15;
+    const bpjs              = gajiPokok * 0.10;
+    const tunjanganKeluarga = pegawai.status === "Menikah" ? gajiPokok * 0.20 : 0; // ternary
+    const totalGaji         = gajiPokok + tunjanganJabatan + bpjs + tunjanganKeluarga;
+
+    // Format Rupiah
+    const rp = (nilai) => "Rp " + nilai.toLocaleString("id-ID");
+
+    // Isi tbody
+    document.getElementById("tbody").innerHTML = `
+        <tr>
+            <td>${pegawai.nama}</td>
+            <td>${pegawai.umur} tahun</td>
+            <td>${pegawai.jabatan}</td>
+            <td>${pegawai.status}</td>
+            <td>${rp(gajiPokok)}</td>
+            <td>${rp(tunjanganJabatan)}</td>
+            <td>${rp(bpjs)}</td>
+            <td>${rp(tunjanganKeluarga)}</td>
+            <td>${rp(totalGaji)}</td>
+        </tr>
+    `;
+
+    // Isi tfoot
+    document.getElementById("tfoot").innerHTML = `
+        <tr>
+            <td colspan="4">Total</td>
+            <td>${rp(gajiPokok)}</td>
+            <td>${rp(tunjanganJabatan)}</td>
+            <td>${rp(bpjs)}</td>
+            <td>${rp(tunjanganKeluarga)}</td>
+            <td>${rp(totalGaji)}</td>
+        </tr>
+    `;
+</script>
+</body>
+</html>
