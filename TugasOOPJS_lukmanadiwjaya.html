@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Sistem Manajemen Transportasi</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f7fb;
+    margin:0;
+    display:flex;
+    justify-content:center;
+}
+
+.container{
+    width:500px;
+    margin-top:40px;
+}
+
+h1{
+    text-align:center;
+    color:#333;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    margin-bottom:20px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border:1px solid #ddd;
+    border-radius:6px;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#4f7cff;
+    border:none;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#3c63d8;
+}
+
+.pelanggan{
+    padding:10px;
+    border-bottom:1px solid #eee;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Manajemen Transportasi</h1>
+
+<div class="card">
+
+<h3>Tambah Pelanggan</h3>
+
+<input type="text" id="nama" placeholder="Nama pelanggan">
+<input type="text" id="telepon" placeholder="Nomor telepon">
+<input type="text" id="kendaraan" placeholder="Kendaraan disewa">
+
+<button onclick="tambahPelanggan()">Simpan</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>Daftar Penyewa</h3>
+
+<div id="daftarPelanggan"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+// CLASS PELANGGAN
+class Pelanggan{
+
+constructor(nama, nomorTelepon){
+    this.nama = nama
+    this.nomorTelepon = nomorTelepon
+    this.kendaraanDisewa = ""
+}
+
+// metode mencatat penyewaan
+sewaKendaraan(kendaraan){
+    this.kendaraanDisewa = kendaraan
+}
+
+}
+
+// array penyimpanan pelanggan
+let daftar = []
+
+// fungsi tambah pelanggan
+function tambahPelanggan(){
+
+let nama = document.getElementById("nama").value
+let telepon = document.getElementById("telepon").value
+let kendaraan = document.getElementById("kendaraan").value
+
+let pelangganBaru = new Pelanggan(nama, telepon)
+
+pelangganBaru.sewaKendaraan(kendaraan)
+
+daftar.push(pelangganBaru)
+
+tampilkanPelanggan()
+
+document.getElementById("nama").value=""
+document.getElementById("telepon").value=""
+document.getElementById("kendaraan").value=""
+
+}
+
+// fungsi tampilkan daftar pelanggan
+function tampilkanPelanggan(){
+
+let area = document.getElementById("daftarPelanggan")
+
+area.innerHTML=""
+
+daftar.forEach(pelanggan => {
+
+area.innerHTML += `
+<div class="pelanggan">
+<b>${pelanggan.nama}</b><br>
+Telepon: ${pelanggan.nomorTelepon}<br>
+Kendaraan: ${pelanggan.kendaraanDisewa}
+</div>
+`
+
+})
+
+}
+
+</script>
+
+</body>
+</html>
